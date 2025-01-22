@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#define BUFSIZE 256
+
 // This program prints the size of a specified file in bytes
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -9,14 +11,23 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    struct stat file_stat;
-    // Validate the input and check if it is a regular file
-    if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
-        fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
+    // Open the file for reading
+    FILE* file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        perror("Error opening file");
         return -1;
     }
 
-    // Print the file size
-    printf("The size of the file is %ld bytes.\n", file_stat.st_size);
+    // Determine the file size
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fclose(file);
+
+    if (file_size < 0) {
+        fprintf(stderr, "Error reading file size.\n");
+        return -1;
+    }
+
+    printf("The size of the file is %ld bytes.\n", file_size);
     return 0;
 }
