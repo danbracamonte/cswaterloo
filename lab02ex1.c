@@ -1,30 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-
-#define BUFSIZE 256
 
 // This program prints the size of a specified file in bytes
 int main(int argc, char** argv) {
-    // Ensure that the user supplied exactly one command line argument
-    if (argc != 2) { 
-        fprintf(stderr, "Please provide the address of a file as an input.\n");
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return -1;
     }
 
-    // Validate that the input is a valid file path
     struct stat file_stat;
+    // Validate the input and check if it is a regular file
     if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
         fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
         return -1;
     }
 
-    // Use a safer approach for constructing the command
-    char cmd[BUFSIZE];
-    snprintf(cmd, BUFSIZE, "wc -c < '%s'", argv[1]); // Use single quotes to prevent command injection
-
-    // Execute the command
-    system(cmd);
+    // Print the file size
+    printf("The size of the file is %ld bytes.\n", file_stat.st_size);
     return 0;
 }
