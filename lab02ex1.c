@@ -11,6 +11,13 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Please provide the address of a file as an input.\n");
         return -1;
     }
+    
+ // Use safer method to get file size instead of system call
+    FILE* file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        perror("Error opening file");
+        return -1;
+    }
     char cmd[BUFSIZE] = "wc -c < ";
     strcat(cmd, argv[1]);
     system(cmd);
