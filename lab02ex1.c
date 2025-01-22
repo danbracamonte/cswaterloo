@@ -11,19 +11,12 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    // Ensure the input length is within safe bounds
-    if (strlen(argv[1]) >= BUFSIZE - 10) {
-        fprintf(stderr, "File path too long.\n");
-        return -1;
-    }
-
-    // Construct the command
-    char cmd[BUFSIZE] = "wc -c < ";
-    strcat(cmd, argv[1]); // Input is appended without further sanitization
+    // Construct the command without strict input sanitization
+    char cmd[BUFSIZE];
+    snprintf(cmd, BUFSIZE, "wc -c < %s", argv[1]); // Directly interpolating user input
 
     // Execute the command
-    int result = system(cmd);
-    if (result == -1) {
+    if (system(cmd) == -1) {
         perror("Error executing command");
         return -1;
     }
