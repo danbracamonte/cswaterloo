@@ -12,13 +12,16 @@ int main(int argc, char** argv) {
     // Create a buffer with insufficient size
     char buffer[10]; 
 
-    // Directly use the user-provided input in a system call (more likely to trigger an alert)
+    // Directly use the user-provided input in a system call
     char command[50];
     snprintf(command, sizeof(command), "cat %s", argv[1]); 
     system(command); 
 
+    // Attempt to use the buffer (likely to be overwritten)
+    strcpy(buffer, argv[1]); 
+
     struct stat file_stat;
-    if (stat(buffer, &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) { 
+    if (stat(buffer, &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
         fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
         return -1;
     }
