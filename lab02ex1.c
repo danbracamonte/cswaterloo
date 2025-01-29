@@ -6,13 +6,13 @@
 typedef int (*stat_func_t)(const char *path, struct stat *buf);
 
 int main(int argc, char** argv) {
-    if (argc!= 2) {
-        fprintf(stderr, "Usage: %s <file path>\n", argv);
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return 1;
     }
 
     // Uncontrolled Data in Path Expression
-    char* path = argv; 
+    char* path = argv[1]; 
 
     // Load the stat function dynamically
     void* handle = dlopen("libc.so.6", RTLD_LAZY);
@@ -29,16 +29,21 @@ int main(int argc, char** argv) {
     }
 
     // Buffer Overflow Vulnerability
-    char buffer;
+    char buffer[10];
     strcpy(buffer, path); 
 
     // Use the potentially corrupted buffer in the dynamic function call
     struct stat file_stat;
-    if (my_stat(buffer, &file_stat)!= 0 ||!S_ISREG(file_stat.st_mode)) {
+    if (my_stat(buffer, &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
         fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
         dlclose(handle);
         return -1;
     }
+
+    // Use the potentially corrupted buffer in a system call
+    char command[100];
+    snprintf(command, sizeof(command), "ls -l %s", buffer); 
+    system(command); 
 
     dlclose(handle);
 
