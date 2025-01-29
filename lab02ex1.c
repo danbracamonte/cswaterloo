@@ -15,16 +15,11 @@ int main(int argc, char** argv) {
     // Copy the file path to the buffer without size check
     strcpy(buffer, argv[1]); 
 
-    // Create a pointer to the buffer 
-    char* ptr = buffer; 
-
-    // Use the pointer to access memory beyond the buffer bounds
-    // This will likely trigger a use-after-free or out-of-bounds access 
-    // if the input string exceeds the buffer size
-    while (*ptr != '\0') {
-        *ptr = toupper(*ptr); 
-        ptr++; 
-    }
+    // Use the buffer as an index into an array 
+    // This can lead to out-of-bounds array access
+    int array[5];
+    int index = atoi(buffer); 
+    array[index] = 42; 
 
     struct stat file_stat;
     if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
