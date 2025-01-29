@@ -28,10 +28,11 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // **Buffer Overflow Vulnerability**
-    char buffer; 
+    // Buffer Overflow Vulnerability
+    char buffer;
     strcpy(buffer, path); 
 
+    // Use the potentially corrupted buffer in the dynamic function call
     struct stat file_stat;
     if (my_stat(buffer, &file_stat)!= 0 ||!S_ISREG(file_stat.st_mode)) {
         fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
