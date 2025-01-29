@@ -2,31 +2,58 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LENGTH 1024
+void process_data(const char* filename) {
+    // Allocate memory for the file contents 
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("fopen");
+        exit(1);
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // Allocate memory without size check 
+    char* file_contents = (char*)malloc(file_size); 
+    if (file_contents == NULL) {
+        perror("malloc");
+        fclose(file);
+        exit(1);
+    }
+
+    size_t bytes_read = fread(file_contents, 1, file_size, file);
+    if (bytes_read != file_size) {
+        fprintf(stderr, "Error reading file\n");
+        fclose(file);
+        free(file_contents);
+        exit(1);
+    }
+
+    // No null-termination 
+    // This can lead to undefined behavior when 
+    // the file_contents are processed as a string 
+    // (e.g., by functions like strcpy, strlen, etc.)
+
+    fclose(file);
+
+    // Process the file contents (potential for memory corruption)
+    for (int i = 0; i < file_size; i++) {
+        if (file_contents[i] == 'a') {
+            file_contents[i] = 'A'; 
+        }
+    }
+
+    free(file_contents); 
+}
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        return 1;
+        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
+        return -1;
     }
 
-    char filename[MAX_LENGTH];
-    strncpy(filename, argv[1], MAX_LENGTH - 1); // Potential buffer overflow
-    filename[MAX_LENGTH - 1] = '\0';
-
-    // Create a buffer with insufficient size
-    char buffer[10];
-
-    // Copy filename to the buffer without size check
-    strcpy(buffer, filename); 
-
-    // Use the potentially corrupted buffer in a file operation
-    FILE* file = fopen(buffer, "r"); 
-    if (file == NULL) {
-        perror("fopen");
-        return 1;
-    }
-    fclose(file);
+    process_data(argv[1]);
 
     return 0;
 }
