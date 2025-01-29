@@ -4,25 +4,22 @@
 
 #define BUFSIZE 256
 
-// This program simulates generating an HTML page reflecting user input
+// Function to simulate a web response containing user input
+void generateWebResponse(const char* filename) {
+    printf("Content-Type: text/html\n\n"); // Simulated HTTP header
+    printf("<html><body>\n");
+    printf("<h1>File size for: %s</h1>\n", filename); // **Vulnerable Output**
+    printf("</body></html>\n");
+}
+
 int main(int argc, char** argv) {
-    // Ensure that the user supplied exactly one command-line argument
     if (argc != 2) { 
-        fprintf(stderr, "Please provide an input argument.\n");
+        fprintf(stderr, "Please provide the address of a file as an input.\n");
         return -1;
     }
 
-    // Simulate an HTML response reflecting user input
-    printf("Content-Type: text/html\n\n");
-    printf("<html>\n");
-    printf("<head><title>XSS Example</title></head>\n");
-    printf("<body>\n");
-
-    // Reflect user input directly in the HTML response (introducing XSS vulnerability)
-    printf("<h1>Welcome, %s</h1>\n", argv[1]);
-
-    printf("</body>\n");
-    printf("</html>\n");
+    // Simulate web output instead of command execution
+    generateWebResponse(argv[1]); // Pass user input directly to the response (VULNERABLE!)
 
     return 0;
 }
