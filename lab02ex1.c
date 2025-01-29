@@ -3,29 +3,45 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#define MAX_PATH_LENGTH 1024
+
 int main(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return -1;
     }
 
-    // Create a buffer with insufficient size
-    char buffer[10]; 
-
-    // Copy the file path to the buffer without size check
-    strcpy(buffer, argv[1]); 
-
-    // Use the buffer in a system call (potential command injection)
-    char command[100];
-    snprintf(command, sizeof(command), "cat %s", buffer); 
-    system(command); 
-
-    struct stat file_stat;
-    if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
-        fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
+    // Input validation
+    if (strlen(argv[1]) >= MAX_PATH_LENGTH) {
+        fprintf(stderr, "File path too long.\n");
         return -1;
     }
 
-    printf("The size of the file is %ld bytes.\n", file_stat.st_size);
+    // Safe copy of the file path
+    char filename[MAX_PATH_LENGTH];
+    strncpy(filename, argv[1], MAX_PATH_LENGTH - 1);
+    filename[MAX_PATH_LENGTH - 1] = '\0'; 
+
+    // Construct the command with proper input validation
+    char command[256]; 
+    snprintf(command, sizeof(command), "stat -c %%s %s", filename); 
+
+    // Execute the command 
+    FILE *pipe = popen(command, "r");
+    if (pipe == NULL) {
+        perror("popen");
+        return -1;
+    }
+
+    char size[100];
+    if (fgets(size, sizeof(size), pipe) == NULL) {
+        perror("fgets");
+        pclose(pipe);
+        return -1;
+    }
+
+    pclose(pipe);
+
+    printf("The size of the file is %s bytes.\n", size); 
     return 0;
 }
