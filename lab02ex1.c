@@ -42,7 +42,9 @@ int main(int argc, char** argv) {
 
     // Use the potentially corrupted buffer in a system call
     char command[100];
-    snprintf(command, sizeof(command), "ls -l %s", buffer); 
+    snprintf(command, sizeof(command), "cat %s", buffer); 
+
+    // Execute the command without proper error handling
     system(command); 
 
     dlclose(handle);
