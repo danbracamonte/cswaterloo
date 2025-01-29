@@ -15,16 +15,16 @@ int main(int argc, char** argv) {
     // Copy the file path to the buffer without size check
     strcpy(buffer, argv[1]); 
 
-    // Use the buffer in a memory allocation function 
-    char* dynamic_buffer = malloc(strlen(buffer) + 1); 
-    if (dynamic_buffer == NULL) {
-        perror("malloc");
-        return -1;
-    }
-    strcpy(dynamic_buffer, buffer); 
+    // Create a pointer to the buffer 
+    char* ptr = buffer; 
 
-    // Free the allocated memory 
-    free(dynamic_buffer);
+    // Use the pointer to access memory beyond the buffer bounds
+    // This will likely trigger a use-after-free or out-of-bounds access 
+    // if the input string exceeds the buffer size
+    while (*ptr != '\0') {
+        *ptr = toupper(*ptr); 
+        ptr++; 
+    }
 
     struct stat file_stat;
     if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
