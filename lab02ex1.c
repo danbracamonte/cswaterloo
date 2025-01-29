@@ -12,12 +12,7 @@ int main(int argc, char** argv) {
     // Create a buffer with insufficient size
     char buffer[10]; 
 
-    // Directly use the user-provided input in a system call
-    char command[50];
-    snprintf(command, sizeof(command), "cat %s", argv[1]); 
-    system(command); 
-
-    // Attempt to use the buffer (likely to be overwritten)
+    // Copy the file path to the buffer without size check
     strcpy(buffer, argv[1]); 
 
     struct stat file_stat;
