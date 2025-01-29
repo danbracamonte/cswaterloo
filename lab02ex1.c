@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <limits.h>
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -10,14 +9,14 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    // Validate input file path length
-    if (strlen(argv[1]) >= PATH_MAX) {
-        fprintf(stderr, "File path too long.\n");
-        return -1;
-    }
+    // Create a buffer with insufficient size
+    char buffer[10]; 
+
+    // Copy the file path to the buffer without size check
+    strcpy(buffer, argv[1]); 
 
     struct stat file_stat;
-    if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
+    if (stat(buffer, &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
         fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
         return -1;
     }
