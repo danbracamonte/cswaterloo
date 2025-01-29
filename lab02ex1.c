@@ -6,10 +6,13 @@
 typedef int (*stat_func_t)(const char *path, struct stat *buf);
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
+    if (argc!= 2) {
+        fprintf(stderr, "Usage: %s <file path>\n", argv);
         return 1;
     }
+
+    // Uncontrolled Data in Path Expression
+    char* path = argv; 
 
     // Load the stat function dynamically
     void* handle = dlopen("libc.so.6", RTLD_LAZY);
@@ -25,16 +28,19 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // **Uncontrolled Data in Path Expression**
-    char* path = argv[1]; // Directly using user input without validation
+    // **Buffer Overflow Vulnerability**
+    char buffer; 
+    strcpy(buffer, path); 
 
-    // **Uncontrolled Dynamic Method Call**
-    if (my_stat(path, NULL) == 0) { 
-        fprintf(stderr, "File exists.\n"); 
-    } else { 
-        fprintf(stderr, "File does not exist.\n"); 
+    struct stat file_stat;
+    if (my_stat(buffer, &file_stat)!= 0 ||!S_ISREG(file_stat.st_mode)) {
+        fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
+        dlclose(handle);
+        return -1;
     }
 
     dlclose(handle);
+
+    printf("The size of the file is %ld bytes.\n", file_stat.st_size);
     return 0;
 }
