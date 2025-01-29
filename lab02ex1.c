@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
     // GOOD: the user string is encoded by a library routine.
     char userNameQuoted[1000] = {0};
     encodeShellString(userNameQuoted, 1000, userName); 
-    char cmd[1000] = {0};
-    sprintf(cmd, "userinfo -v %s", userNameQuoted);
-    system(cmd);
+    char command2[1000] = {0};
+    sprintf(command2, "userinfo -v %s", userNameQuoted);
+    system(command2);
 
     
     // char cmd[BUFSIZE] = "wc -c < ";
