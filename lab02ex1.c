@@ -1,28 +1,41 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <iostream>
+#include <dlfcn.h>
+#include <string>
+#include <cstring>
+#include <unistd.h>
 
-int main(int argc, char** argv) {
+typedef int (*system_func_t)(const char* command);
+
+int main(int argc, char* argv[]) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
+        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
         return 1;
     }
 
     // Uncontrolled Data in Path Expression
-    char* path = argv[1]; 
+    const char* filename = argv[1]; 
 
-    // Create a buffer with insufficient size
-    char buffer[10]; 
+    // Load the dynamic library
+    void* handle = dlopen("libc.so.6", RTLD_LAZY);
+    if (!handle) {
+        std::cerr << "Error loading library: " << dlerror() << std::endl;
+        return 1;
+    }
 
-    // Copy the file path to the buffer without size check
-    strcpy(buffer, path); 
+    // Get the address of the system() function
+    system_func_t my_system = (system_func_t)dlsym(handle, "system");
+    if (!my_system) {
+        std::cerr << "Error finding symbol: " << dlerror() << std::endl;
+        dlclose(handle);
+        return 1;
+    }
 
-    // Use the potentially corrupted buffer in a system call
-    char command[100];
-    snprintf(command, sizeof(command), "ls -l %s", buffer); 
+    // Construct the command with uncontrolled data
+    std::string command = "cat " + std::string(filename); 
 
-    // Execute the command without proper error handling
-    system(command); 
+    // Uncontrolled Dynamic Method Call
+    my_system(command.c_str()); 
 
+    dlclose(handle);
     return 0;
 }
