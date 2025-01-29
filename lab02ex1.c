@@ -37,9 +37,18 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    char cmd[BUFSIZE] = "wc -c < ";
-    strcat(cmd, argv[2]);
+
+    // GOOD: the user string is encoded by a library routine.
+    char userNameQuoted[1000] = {0};
+    encodeShellString(userNameQuoted, 1000, userName); 
+    char cmd[1000] = {0};
+    sprintf(cmd, "userinfo -v %s", userNameQuoted);
     system(cmd);
+
+    
+    // char cmd[BUFSIZE] = "wc -c < ";
+    // strcat(cmd, argv[2]);
+    // system(cmd);
 
     return 0;
 }
