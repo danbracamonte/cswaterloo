@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include <string.h>
+#include <dlfcn.h>
 
-#define MAX_PATH_LENGTH 1024
+typedef int (*stat_func_t)(const char *path, struct stat *buf);
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -11,37 +11,29 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    // Input validation
-    if (strlen(argv[1]) >= MAX_PATH_LENGTH) {
-        fprintf(stderr, "File path too long.\n");
+    // Load the stat function dynamically
+    void* handle = dlopen("libc.so.6", RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "Error loading library: %s\n", dlerror());
+        return 1;
+    }
+
+    stat_func_t my_stat = (stat_func_t)dlsym(handle, "stat");
+    if (!my_stat) {
+        fprintf(stderr, "Error finding symbol: %s\n", dlerror());
+        dlclose(handle);
+        return 1;
+    }
+
+    struct stat file_stat;
+    if (my_stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
+        fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
+        dlclose(handle);
         return -1;
     }
 
-    // Safe copy of the file path
-    char filename[MAX_PATH_LENGTH];
-    strncpy(filename, argv[1], MAX_PATH_LENGTH - 1);
-    filename[MAX_PATH_LENGTH - 1] = '\0'; 
+    dlclose(handle);
 
-    // Construct the command with proper input validation
-    char command[256]; 
-    snprintf(command, sizeof(command), "stat -c %%s %s", filename); 
-
-    // Execute the command 
-    FILE *pipe = popen(command, "r");
-    if (pipe == NULL) {
-        perror("popen");
-        return -1;
-    }
-
-    char size[100];
-    if (fgets(size, sizeof(size), pipe) == NULL) {
-        perror("fgets");
-        pclose(pipe);
-        return -1;
-    }
-
-    pclose(pipe);
-
-    printf("The size of the file is %s bytes.\n", size); 
+    printf("The size of the file is %ld bytes.\n", file_stat.st_size);
     return 0;
 }
