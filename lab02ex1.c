@@ -1,17 +1,28 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
- 
+
 #define BUFSIZE 256
-    
-// This program prints the size of a specified file in bytes
+
+// This program simulates generating an HTML page reflecting user input
 int main(int argc, char** argv) {
-    // Ensure that the user supplied exactly one command line argument
+    // Ensure that the user supplied exactly one command-line argument
     if (argc != 2) { 
-        fprintf(stderr, "Please provide the address of a file as an input.\n");
+        fprintf(stderr, "Please provide an input argument.\n");
         return -1;
     }
-    char cmd[BUFSIZE] = "wc -c < ";
-    strcat(cmd, argv[1]);
-    system(cmd);
+
+    // Simulate an HTML response reflecting user input
+    printf("Content-Type: text/html\n\n");
+    printf("<html>\n");
+    printf("<head><title>XSS Example</title></head>\n");
+    printf("<body>\n");
+
+    // Reflect user input directly in the HTML response (introducing XSS vulnerability)
+    printf("<h1>Welcome, %s</h1>\n", argv[1]);
+
+    printf("</body>\n");
+    printf("</html>\n");
+
+    return 0;
 }
