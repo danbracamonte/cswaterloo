@@ -37,8 +37,10 @@ int main(int argc, char** argv) {
         return -1;
     }
 
+    // char userNameQuoted[1000] = {0};
     
     char cmd[BUFSIZE] = "wc -c < ";
+    encodeShellString(cmd, BUFSIZE, userName); 
     strcat(cmd, argv[2]);
     system(cmd);
 
