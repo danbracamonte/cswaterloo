@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Error getting file size.\n");
         return -1;
     }
-
-     printf("The size of the file is %ld bytes.\n", sizeof(FILE));
+     
+     printf("The size of the file is %d bytes.\n", sizeof(FILE));
     return 0;
 }
