@@ -8,17 +8,16 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    FILE *fp = fopen(argv[1], "rb");
+    FILE* fp = fopen(argv[1], "rb");
     if (fp == NULL) {
         fprintf(stderr, "Error opening file.\n");
         return -1;
     }
 
-    // fseek(fp, 0, SEEK_END); // Move file pointer to the end
-    long file_size;// = ftell(fp); 
-    //fclose(fp);
+    fseek(fp, 0, SEEK_END); // Move file pointer to the end
+    long file_size = ftell(fp); 
+    fclose(fp);
     
-
     if (file_size < 0) {
         fprintf(stderr, "Error getting file size.\n");
         return -1;
