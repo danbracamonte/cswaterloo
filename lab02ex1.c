@@ -24,6 +24,6 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    printf("The size of the file is %ld bytes.\n", sizeof(fp));
+    // printf("The size of the file is %ld bytes.\n", sizeof(fp));
     return 0;
 }
