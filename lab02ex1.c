@@ -14,16 +14,16 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    /* fseek(fp, 0, SEEK_END); // Move file pointer to the end
-    long file_size = ftell(fp); 
-    fclose(fp);
-    */ 
+    // fseek(fp, 0, SEEK_END); // Move file pointer to the end
+    long file_size;// = ftell(fp); 
+    //fclose(fp);
+    
 
     if (file_size < 0) {
         fprintf(stderr, "Error getting file size.\n");
         return -1;
     }
 
-    // printf("The size of the file is %ld bytes.\n", sizeof(fp));
+     printf("The size of the file is %ld bytes.\n", sizeof(fp));
     return 0;
 }
