@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 int main(int argc, char** argv) {
+    
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return -1;
@@ -13,15 +14,16 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    fseek(fp, 0, SEEK_END); // Move file pointer to the end
+    /* fseek(fp, 0, SEEK_END); // Move file pointer to the end
     long file_size = ftell(fp); 
     fclose(fp);
+    */ 
 
     if (file_size < 0) {
         fprintf(stderr, "Error getting file size.\n");
         return -1;
     }
 
-    printf("The size of the file is %ld bytes.\n", file_size);
+    printf("The size of the file is %ld bytes.\n", sizeof(fp));
     return 0;
 }
