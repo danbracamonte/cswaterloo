@@ -1,44 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 
 int main(int argc, char** argv) {
-
-  // declaring file pointer 
-    file_stat* fptr; 
-  
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <file path>\n", argv[0]);
         return -1;
     }
 
-    struct stat file_stat;
-    if (stat(argv[1], &file_stat) != 0 || !S_ISREG(file_stat.st_mode)) {
-        fprintf(stderr, "Invalid file. Please provide a valid file path.\n");
+    FILE *fp = fopen(argv[1], "rb");
+    if (fp == NULL) {
+        fprintf(stderr, "Error opening file.\n");
         return -1;
     }
 
-    // printf("The size of the file is %ld bytes.\n", file_stat.st_size);
-    printf("Size of FILE Structure: %d bytes", 
-    sizeof(file_stat)); 
+    fseek(fp, 0, SEEK_END); // Move file pointer to the end
+    long file_size = ftell(fp); 
+    fclose(fp);
+
+    if (file_size < 0) {
+        fprintf(stderr, "Error getting file size.\n");
+        return -1;
+    }
+
+    printf("The size of the file is %ld bytes.\n", file_size);
     return 0;
 }
-
-
-/*
-
-// C Program to demonstrate the file pointer 
-#include <stdio.h> 
-  
-int main() 
-{ 
-    // declaring file pointer 
-    FILE* fptr; 
-  
-    // trying to get the size of FILE datatype. 
-    printf("Size of FILE Structure: %d bytes", 
-           sizeof(FILE)); 
-  
-    return 0; 
-}
-*/
